@@ -1,0 +1,19 @@
+{
+  "name": "jack-backend",
+  "version": "1.0.0",
+  "description": "jack's app backend database and api wiring",
+  "main": "index.js",
+  "create":"create.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "newton_mathenge",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "pg": "^8.2.1",
+    "postgresql": "0.0.1",
+    "react-icons": "^3.10.0"
+  }
+}
