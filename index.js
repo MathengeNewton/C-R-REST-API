@@ -5,15 +5,30 @@ const {Client} = require('pg')
 const port = process.env.PORT || 3000;
 
 //create a connection to db
-
+let create = `
+CREATE TABLE emails(
+    id serial,
+    email varchar(255) not null,
+    name varchar(255) not null,
+    primary key(id)
+);
+`
 const client = new Client({
     user: 'jack',
-    host: 'localhost',
+    host: 'db',
     database: 'jackdreds',
     password: '12345',
     port: 5432,
 })
-client.connect()
+
+    client.connect()
+    client.query(create)
+    .then(()=>console.log("connected"))
+    .catch(e=>{
+            console.log(e)                       
+        })
+
+
 
 //get req to all records in files
 app.get('/emails',(req,res)=>{
