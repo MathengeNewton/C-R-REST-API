@@ -1,7 +1,4 @@
 /.vscode
 /node_modules
 .package-lock.json
-<<<<<<< HEAD
-.create.js
-=======
->>>>>>> 8cd46a93f662aa4057938eb5a5d190e183063c5a
+

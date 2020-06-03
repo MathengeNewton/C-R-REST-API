@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS users(
 `
 const client = new Client({
     user: 'jack',
-    host: 'localhost',
+    host: 'db',
     database: 'jackdreds',
     password: '12345',
     port: 5432,
