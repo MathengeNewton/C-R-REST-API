@@ -9,15 +9,10 @@ services:
         volumes: 
             - ./pgdata:/var/lib/postgres/data
         ports: 
-            - '5432:5432' 
-    db_init: 
-        image: node-init-db
-        ports: 
-            - '3001:3001'      
+            - '5432:5432'       
     api: 
         image: node-postgres-api
         depends_on:
-            - db_init
             - db
         ports: 
             - '3000:3000'
