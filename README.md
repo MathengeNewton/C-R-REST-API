@@ -1,13 +1,8 @@
-This api is created in NodeJs + ExpressJs + PostgreSQL.
+Node ExpressJs + PostgreSQL.
 requirements:<br>
-node.<br>
-postgress.<br>
-node-postgres(pg).<br>
-express .<br>
-nodemon(hot-reload)
-create database
-## run `nodemon create` 
-## run `nodemon main` 
+node<br>
+postgress<br>
+node-postgres(pg)<br>
+express<br>
+nodemon(hot-reload)<br>
 
-API up and running 
-check routes and implement

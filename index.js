@@ -6,10 +6,10 @@ const port = process.env.PORT || 3000;
 
 //create a connection to db
 let create = `
-CREATE TABLE IF NOT EXISTS emails(
+CREATE TABLE IF NOT EXISTS messages(
     id serial,
     email varchar(255) not null,
-    name varchar(255) not null,
+    message varchar(255) not null,
     primary key(id)
 );
 CREATE TABLE IF NOT EXISTS users(
@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS users(
 );
 `
 const client = new Client({
-    user: 'jack',
-    host: 'db',
-    database: 'jackdreds',
-    password: '12345',
+    user: 'postgres',
+    host: 'localhost',
+    database: 'newton',
+    password: 'mathenge,./1998',
     port: 5432,
 })
 
@@ -42,27 +42,8 @@ const checkemail =(mail)=>{
         return false
     }
 }
-//update logdetails
-// const updateLogs=(email)=>{
-//     const accessemail = email
-//     console.log(accessemail)
-//     const accessdate = new Date().toLocaleDateString()
-//     console.log(accessdate)
-//     const accesstime = new Date().toLocaleTimeString()
-//     console.log(accesstime)
-//     const query = `INSERT INTO accesslogs(email,date,time)
-//                     VALUES(${accessemail},${accessdate},${accesstime})`
-                    
-//     client.query(query)
-//             .then(res =>{
-//                 console.log(res)
-//             })
-//             .catch(error=>{
-//                 console.log(error)
-//             })
-// }
 //create account
-app.post('/users/register',(req,res)=>{
+app.post('/api/users/register',(req,res)=>{
     if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
         res.status(400).send(
             {
@@ -113,8 +94,9 @@ app.post('/users/register',(req,res)=>{
     }
 }
 })
-//access management..log in
-app.get('/users/login',(req,res)=>{
+
+//access..log in
+app.get('/api/users/login',(req,res)=>{
     if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
         res.status(400).send(
             {
@@ -156,7 +138,6 @@ app.get('/users/login',(req,res)=>{
             const fr = r.rows[0]
             const localpass = fr['password']
             if(localpass == password){
-                // updateLogs(email)
                 res.status(200).send(
                     {
                         user: email,
@@ -185,8 +166,8 @@ app.get('/users/login',(req,res)=>{
     }
    }
 })
-//get req to all records in files
-app.get('/emails',(req,res)=>{
+//get all records in files
+app.get('/api/messages',(req,res)=>{
     if(!req.method == 'get'){
         res.status(400).send(
             {
@@ -195,13 +176,12 @@ app.get('/emails',(req,res)=>{
             }
         )
     }else{
-    const query = 'SELECT * FROM emails;'
+    const query = 'SELECT * FROM messages;'
     client
         .query(query)
         .then(r => {
             let sdata = r.rows.length
-            if (sdata > 0){       
-                console.log(r.rows.email)         
+            if (sdata > 0){               
                 res.status(200).send(
                     {
                         staus: 200,
@@ -212,7 +192,7 @@ app.get('/emails',(req,res)=>{
                 res.send(
                     {
                         status: 204,
-                        message: '*no emails available'
+                        message: '*no messages available'
                     }
                 )
             }
@@ -227,7 +207,7 @@ app.get('/emails',(req,res)=>{
     }
 })
 //get email by request
-app.get('/email',(req,res)=>{
+app.get('/api/message',(req,res)=>{
     if (!req.query || !req.query.email || typeof(req.query.email) !== 'string' || !req.method == 'get'){
         res.status(400).send(
             {
@@ -245,7 +225,7 @@ app.get('/email',(req,res)=>{
             }
         )
     }else{
-        const query = `SELECT * FROM emails WHERE email = '${email}';`
+        const query = `SELECT * FROM messages WHERE email = '${email}';`
         client
         .query(query)
         .then(r=>{
@@ -281,19 +261,12 @@ app.get('/email',(req,res)=>{
 })
 
 //add new record to the database
-app.post('/email/add',(req,res)=>{
-    if(!req.query ||!req.method == 'post' || !req.query.email || !req.query.name){
+app.post('/api/message/add',(req,res)=>{
+    if(!req.query ||!req.method == 'post' || !req.query.email || !req.query.message){
         res.status(400).send(
             {
                 status: 400,
                 error: "incorrect query format"
-            }
-        )
-    }else if(req.query.name.length <= 5){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "name too short"
             }
         )
     }else if(req.query.email.length < 10){
@@ -303,13 +276,6 @@ app.post('/email/add',(req,res)=>{
                 error: "invalid email"
             }
         )
-    }else if(typeof(req.query.name) !== 'string'){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "name should be of type String"
-            }
-        )
     }else if(!checkemail(req.query.email)){
         res.status(400).send(
             {
@@ -317,25 +283,18 @@ app.post('/email/add',(req,res)=>{
                 error: "incorrect email"
             }
         )
-    }else if(typeof(req.query.email) !== 'string'){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "email should be of type String"
-            }
-        )
     }else{
     
-    const sentname = req.query.name
+    const sentmessage = req.query.message
     const sentemail = req.query.email
-    const query = `INSERT INTO emails(email,name)
-                VALUES('${sentemail}','${sentname}')`
+    const query = `INSERT INTO messsages(email,message)
+                VALUES('${sentemail}','${sentmessage}')`
     client
         .query(query)
         .then(r =>{
             const mres = {
                 data:{
-                    name: sentname,
+                    message: sentmessage,
                     email: sentemail
                 }
             }
