@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const {Client} = require('pg')
+const {Client} = require('pg');
+const env = require('dotenv').config();
 //alternative port declaration
 const port = process.env.PORT || 3000;
 
@@ -21,8 +22,8 @@ CREATE TABLE IF NOT EXISTS users(
 const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'newton',
-    password: 'mathenge,./1998',
+    database: process.env.DATABASE_NAME,
+    password: process.env.DATABASE_PASSWORD,
     port: 5432,
 })
 
