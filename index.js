@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS users(
 );
 `
 const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
+    user: process.env.DATABASE_USER,
+    host: process.env.DATABASE_URL,
     database: process.env.DATABASE_NAME,
     password: process.env.DATABASE_PASSWORD,
-    port: 5432,
+    port: process.env.DATABASE_PORT
 })
 
-    client.connect()
+    client.connect().catch(e=>console.log(e))
     client.query(create)
     .then(()=>console.log("connected"))
     .catch(e=>{
