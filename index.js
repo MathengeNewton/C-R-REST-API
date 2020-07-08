@@ -11,11 +11,12 @@ CREATE TABLE IF NOT EXISTS messages(
     id serial,
     email varchar(255) not null,
     message varchar(255) not null,
+    date varchar(255),
     primary key(id)
 );
 CREATE TABLE IF NOT EXISTS users(
     id serial,
-    email varchar(255) not null,
+    email varchar(255) not null unique,
     password varchar(255) not null
 );
 `
@@ -43,136 +44,137 @@ const checkemail =(mail)=>{
         return false
     }
 }
-//create account
-app.post('/api/users/register',(req,res)=>{
-    if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "incorrect query format"
-            }
-        )
-    }else{
-    const email = req.query.email
-    const password = req.query.password
-    if(!checkemail(email)){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "incorrect email"
-            }
-        )
-    }else if(password.length < 6){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "Password too short"
-            }
-        )  
-    }else{
-        const query = `INSERT INTO users(email,password)
-                        VALUES('${email}','${password}')`
-        client
-            .query(query)
-            .then(queryresponse=>{
-                const qr = {
-                    username : email
-                }
-                console.log(queryresponse)
-                res.status(200).send(
-                    {
-                        data: qr
-                    }
-                )
-            })
-            .catch(e=>{
-                res.status(500).send(
-                    {
-                        error:'internal server error'
-                    }
-                )
-            })
-    }
-}
-})
 
-//access..log in
-app.get('/api/users/login',(req,res)=>{
-    if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "incorrect query format"
-            }
-        )
-    }else{
-    const email = req.query.email
-    const password = req.query.password
-    if(!checkemail(email)){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "incorrect email"
-            }
-        )
-    }else if(password.length < 6){
-        res.status(400).send(
-            {
-                status: 400,
-                error: "Password too short"
-            }
-        )  
-    }else{
-    const query = `SELECT * FROM users WHERE email = '${email}'`
-    client
-    .query(query)
-    .then(r=>{
-        const queryrows = r.rows.length
-        if(!queryrows){
-            res.send(
-                {
-                    status: 204,
-                    message: `no account with email: ${email}`
-                }
-            )
-        }else{
-            const fr = r.rows[0]
-            const localpass = fr['password']
-            if(localpass == password){
-                res.status(200).send(
-                    {
-                        user: email,
-                        status: `access granted `
+
+//create account
+// app.post('/api/users/register',(req,res)=>{
+//     if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "incorrect query format"
+//             }
+//         )
+//     }else{
+//     const email = req.query.email
+//     const password = req.query.password
+//     if(!checkemail(email)){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "incorrect email"
+//             }
+//         )
+//     }else if(password.length < 6){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "Password too short"
+//             }
+//         )  
+//     }else{
+//         const query = `INSERT INTO users(email,password)
+//                         VALUES('${email}','${password}')`
+//         client
+//             .query(query)
+//             .then(queryresponse=>{
+//                 const qr = {
+//                     username : email
+//                 }
+//                 console.log(queryresponse)
+//                 res.status(200).send(
+//                     {
+//                         data: qr
+//                     }
+//                 )
+//             })
+//             .catch(e=>{
+//                 res.status(500).send(
+//                     {
+//                         error:'Check your email and try again'
+//                     }
+//                 )
+//             })
+//     }
+// }
+// })
+
+// //access..log in
+// app.get('/api/users/login',(req,res)=>{
+//     if (!req.query || !req.query.email ||!req.query.password || typeof(req.query.email) !== 'string' ||typeof(req.query.password) !== 'string'){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "incorrect query format"
+//             }
+//         )
+//     }else{
+//     const email = req.query.email
+//     const password = req.query.password
+//     if(!checkemail(email)){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "incorrect email"
+//             }
+//         )
+//     }else if(password.length < 6){
+//         res.status(400).send(
+//             {
+//                 status: 400,
+//                 error: "Password too short"
+//             }
+//         )  
+//     }else{
+//     const query = `SELECT * FROM users WHERE email = '${email}'`
+//     client
+//     .query(query)
+//     .then(r=>{
+//         const queryrows = r.rows.length
+//         if(!queryrows){
+//             res.send(
+//                 {
+//                     status: 204,
+//                     message: `no account with email: ${email}`
+//                 }
+//             )
+//         }else{
+//             const fr = r.rows[0]
+//             const localpass = fr['password']
+//             if(localpass == password){
+//                 res.status(200).send(
+//                     {
+//                         user: email,
+//                         status: `access granted `
                         
-                    }
-                )
-            }else{
-                res.status(204).send(
-                    {
-                        user: email,
-                        status:`access denied `
-                    }
-                )
-            }
-         }
-        })
-        .catch(e=>{
-            console.log(e)
-            res.status(500).send(
-                {
-                    error: `Internal server error`
-                }
-            )
-        })
-    }
-   }
-})
+//                     }
+//                 )
+//             }else{
+//                 res.status(204).send(
+//                     {
+//                         user: email,
+//                         status:`access denied `
+//                     }
+//                 )
+//             }
+//          }
+//         })
+//         .catch(e=>{
+//             console.log(e)
+//             res.status(500).send(
+//                 {
+//                     error: `Internal server error`
+//                 }
+//             )
+//         })
+//     }
+//    }
+// })
 //get all records in files
 app.get('/api/messages',(req,res)=>{
     if(!req.method == 'get'){
         res.status(400).send(
             {
-                status:200,
                 error:'bad request method'
             }
         )
@@ -185,14 +187,12 @@ app.get('/api/messages',(req,res)=>{
             if (sdata > 0){               
                 res.status(200).send(
                     {
-                        staus: 200,
                         records: r.rows
                     }
                 )
             }else{
-                res.send(
+                res.status(204).send(
                     {
-                        status: 204,
                         message: '*no messages available'
                     }
                 )
@@ -221,12 +221,11 @@ app.get('/api/message',(req,res)=>{
     if(!checkemail(email)){
         res.status(400).send(
             {
-                status: 400,
                 error: "incorrect email"
             }
         )
     }else{
-        const query = `SELECT * FROM messages WHERE email = '${email}';`
+        const query = `SELECT * FROM messages WHERE email = '${email}' ORDER BY date DESC;`
         client
         .query(query)
         .then(r=>{
@@ -234,14 +233,12 @@ app.get('/api/message',(req,res)=>{
             if (sdata > 0){
                 res.status(200).send(
                     {
-                        status: 200,
                         data: r.rows
                     }
                 )
             }else{
-                res.send(
+                res.status(204).send(
                     {
-                        status: 204,
                         message: '*email not available'
                     }
                 )
@@ -249,9 +246,8 @@ app.get('/api/message',(req,res)=>{
                             
             })
         .catch(err =>{
-            res.send(
+            res.status(500).send(
                 {
-                    status:500,
                     error:"internal server error"
                 }
             )
@@ -266,47 +262,45 @@ app.post('/api/message/add',(req,res)=>{
     if(!req.query ||!req.method == 'post' || !req.query.email || !req.query.message){
         res.status(400).send(
             {
-                status: 400,
                 error: "incorrect query format"
             }
         )
     }else if(req.query.email.length < 10){
         res.status(400).send(
             {
-                status: 400,
                 error: "invalid email"
             }
         )
     }else if(!checkemail(req.query.email)){
         res.status(400).send(
             {
-                status: 400,
                 error: "incorrect email"
             }
         )
     }else{
     
     const sentmessage = req.query.message
-    const sentemail = req.query.email
-    const query = `INSERT INTO messsages(email,message)
-                VALUES('${sentemail}','${sentmessage}')`
+    const sentemail = req.query.email 
+    const date = new Date().toLocaleDateString()
+    console.log(date)
+    const query = `INSERT INTO messages(email,message,date)
+                VALUES('${sentemail}','${sentmessage}','${date}')`
     client
         .query(query)
         .then(r =>{
             const mres = {
                 data:{
-                    message: sentmessage,
-                    email: sentemail
+                    email: sentemail,
+                    response: `Your message was received`
                 }
             }
             res.status(200).send(mres)            
         })
         .catch(
             e =>{
-                console.log(`this error is ${e}`)
+                console.log(`the error is ${e}`)
                 res.status(500).send(
                     {
-                        status:500,
                         error: e
                     }
                 )
